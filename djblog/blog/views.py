@@ -8,7 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
-
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
 
 class PostView(viewsets.ModelViewSet):
      permission_classes = [IsAuthenticated, ]
@@ -80,13 +81,27 @@ def ToDoDetail(request,pk):
 	return Response(serializer.data)
 
 class postProfileView(APIView):
- 
-     
     def get(self,request,username):
           user  = User.objects.get(username=username)
           pquery = Profile.objects.get(user=user)
           serializer = ProfileSerializer(pquery)
           return Response({"message":"Request is get","userdata":serializer.data})
+     
+     
+     
+class login(APIView):
+     def post(self,request):
+          email = request.data['username']
+          password = request.data['password']
+          user = authenticate( email=email, password=password)
+          print(user)
+          # if User.objects.get(email = email,password=password):
+          #      token = Token.objects.get(User.objects.get(email = email,password=password))
+          #      return Response({"error":False, "message":"User successfully created","data":token})
+          print(password)
+          # if serializers.is_valid():
+          #      serializers.save()
+          return Response({"error":True, "message":"A user already created"})  
 # class PostUserProfileView(APIView):
 #     permission_classes = [IsAuthenticated, ]
 #     authentication_classes = [TokenAuthentication, ]
